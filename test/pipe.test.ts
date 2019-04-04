@@ -1,4 +1,4 @@
-import { pipe, typedPipe, pipeValue } from '../src/tspipe'
+import { pipe, typedPipe, pipeValue } from '../src/ts-functional-pipe'
 
 const map = <T, TOut>(selector: (v: T, i: number) => TOut) => (
   src: Iterable<T>

@@ -1,11 +1,11 @@
 {
-  "name": "tspipe",
+  "name": "ts-functional-pipe",
   "version": "0.0.0-development",
   "description": "",
   "keywords": [],
-  "main": "dist/tspipe.umd.js",
-  "module": "dist/tspipe.es5.js",
-  "typings": "dist/types/tspipe.d.ts",
+  "main": "dist/ts-functional-pipe.umd.js",
+  "module": "dist/ts-functional-pipe.es5.js",
+  "typings": "dist/types/ts-functional-pipe.d.ts",
   "files": [
     "dist"
   ],
