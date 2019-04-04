@@ -26,11 +26,10 @@ const filter = <T>(pred: (v: T, i: number) => boolean) => (src: Iterable<T>): It
   }
 }
 
-describe('Dummy test', () => {
-  it('works if true is truthy', () => {
-    const tp = typedPipe<Iterable<number>>()
-    const p = tp(map(x => (x * 2).toString()))
-
+describe('ts-functional-pipe', () => {
+  const tp = typedPipe<Iterable<number>>()
+  const p = tp(map(x => (x * 2).toString()))
+  it('pipes', () => {
     expect([...p([1, 2, 3])]).toEqual(['2', '4', '6'])
 
     expect([...pipeValue([1, 2, 3]).into(p)]).toEqual(['2', '4', '6'])
