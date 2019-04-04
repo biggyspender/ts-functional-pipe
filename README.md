@@ -1,6 +1,6 @@
 ## Type-safe, functional-style pipe functions for typescript
 
-In the absence of `|>`, the pipe operator, it's useful to have a type-safe `pipe` function that can compose an a large (up to 32) number of unary functions. This minimal library contains a few different helper functions for this purpose.
+In the absence of `|>` (the pipe operator) it's useful to have a type-safe `pipe` function that can compose an a large (up to 32) number of unary functions. This minimal library contains a few different helper functions for this purpose.
 
 Suppose we have the following unary functions:
 
