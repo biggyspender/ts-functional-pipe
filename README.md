@@ -106,7 +106,9 @@ const transformed =
     ) // iterable with values [2, 6]
 ```
 
-Using `pipeValue`, we can pipe values through a single-use pip. If instead, we're looking for a re-useable pipe, we can use `pipe(...unaryFuncs)` or `typedPipe<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully:
+Using `pipeValue`, we can pipe values through a single-use pipe. 
+
+If instead, we're looking for a re-useable pipe, we can use `pipe(...unaryFuncs)` or `typedPipe<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully. We can either use `pipe`
 
 ```typescript
 const oddNumbersMultipliedByTwoPipe =
@@ -120,7 +122,7 @@ const oddNumbersMultipliedByTwoPipe =
     )
 ```
 
-or, by making a pipe that expects the first function it contains to be of a specific type (using `typedPipe<T>`):
+or make a pipe that expects the first function it contains to have a parameter of a specific type (using `typedPipe<T>`):
 
 ```typescript
     const oddNumbersMultipliedByTwoPipe =
