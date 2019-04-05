@@ -12,7 +12,7 @@
   "author": "Chris Sperry <christophermartinsperry@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/biggyspender/tspipe"
+    "url": "https://github.com/biggyspender/ts-functional-pipe"
   },
   "license": "MIT",
   "engines": {
