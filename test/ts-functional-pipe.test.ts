@@ -1,30 +1,24 @@
 import { pipe, typedPipe, pipeValue } from '../src/ts-functional-pipe'
 
-const map = <T, TOut>(selector: (v: T, i: number) => TOut) => (
-  src: Iterable<T>
-): Iterable<TOut> => {
-  return {
-    [Symbol.iterator]: function*() {
-      let c = 0
-      for (const v of src) {
-        yield selector(v, c++)
-      }
-    }
-  }
-}
+const toIterable = <T, TF extends () => IterableIterator<T>>(f: TF) => ({ [Symbol.iterator]: f })
 
-const filter = <T>(pred: (v: T, i: number) => boolean) => (src: Iterable<T>): Iterable<T> => {
-  return {
-    [Symbol.iterator]: function*() {
-      let i = 0
-      for (const x of src) {
-        if (pred(x, i++)) {
-          yield x
-        }
+const map = <T, TOut>(selector: (v: T, i: number) => TOut) => (src: Iterable<T>): Iterable<TOut> =>
+  toIterable(function*() {
+    let c = 0
+    for (const v of src) {
+      yield selector(v, c++)
+    }
+  })
+
+const filter = <T>(pred: (v: T, i: number) => boolean) => (src: Iterable<T>): Iterable<T> =>
+  toIterable(function*() {
+    let i = 0
+    for (const x of src) {
+      if (pred(x, i++)) {
+        yield x
       }
     }
-  }
-}
+  })
 
 describe('ts-functional-pipe', () => {
   const tp = typedPipe<Iterable<number>>()
