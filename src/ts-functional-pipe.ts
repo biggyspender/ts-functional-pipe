@@ -1,3 +1,5 @@
+export { deferP0 } from './deferP0'
+
 type UF<TIn, TOut> = (x: TIn) => TOut
 
 function pipeImpl<T, R>(...operations: UF<any, any>[]): UF<T, R> {
