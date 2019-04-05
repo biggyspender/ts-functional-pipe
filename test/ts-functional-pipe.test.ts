@@ -1,8 +1,8 @@
 import { pipe, typedPipe, pipeValue } from '../src/ts-functional-pipe'
+import { toIterable } from './toIterable'
+import { deferP0 } from '../src/deferP0'
 
-const toIterable = <T, TF extends () => IterableIterator<T>>(f: TF) => ({ [Symbol.iterator]: f })
-
-const map = <T, TOut>(selector: (v: T, i: number) => TOut) => (src: Iterable<T>): Iterable<TOut> =>
+const _map = <T, TOut>(src: Iterable<T>, selector: (v: T, i: number) => TOut): Iterable<TOut> =>
   toIterable(function*() {
     let c = 0
     for (const v of src) {
@@ -10,7 +10,7 @@ const map = <T, TOut>(selector: (v: T, i: number) => TOut) => (src: Iterable<T>)
     }
   })
 
-const filter = <T>(pred: (v: T, i: number) => boolean) => (src: Iterable<T>): Iterable<T> =>
+const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Iterable<T> =>
   toIterable(function*() {
     let i = 0
     for (const x of src) {
@@ -19,6 +19,9 @@ const filter = <T>(pred: (v: T, i: number) => boolean) => (src: Iterable<T>): It
       }
     }
   })
+
+const map = deferP0(_map)
+const filter = deferP0(_filter)
 
 describe('ts-functional-pipe', () => {
   const tp = typedPipe<Iterable<number>>()
