@@ -4,82 +4,144 @@ In the absence of `|>` (the pipe operator) it's useful to have a type-safe `pipe
 
 Suppose we have the following unary functions:
 
-    const dinosaurify = (name:string) => `${name}-o-saurus`
-    const sayHello = (name:string) => `Hello, ${name}!`
+```typescript
+const dinosaurify = (name:string) => `${name}-o-saurus`
+const sayHello = (name:string) => `Hello, ${name}!`
+```
 
 We can compose these functions into a single function using the pipe function:
 
-    const sayHelloToDinosaur = pipe(dinosaurify, sayHello)
+```typescript
+const sayHelloToDinosaur = pipe(dinosaurify, sayHello)
+```
 
 and call it
 
-    sayHelloToDinosaur("mike") // "Hello, mike-o-saurus!"
+```typescript
+sayHelloToDinosaur("mike") // "Hello, mike-o-saurus!"
+```
 
 Alternatively, we could have called
 
-    pipeValue("mike").into(dinosaurify, sayHello) // "Hello, mike-o-saurus!"
+```typescript
+pipeValue("mike").into(dinosaurify, sayHello) // "Hello, mike-o-saurus!"
+```
 
 ### OK, great, but... Why?
 
-Pipes work with unary-functions, using the return value of one function as the only parameter to the next function.
+Pipes work with **unary**-functions, using the return value of one function as the only parameter to the next function.
 
 Say we create our own versions the Array map and filter functions to work over `Iterable<T>`
 
-    const map =
-      <T, TOut>(selector: (v: T, i: number) => TOut) => (src: Iterable<T>): Iterable<TOut> => {
-        return {
-          [Symbol.iterator]: function* () {
-            let c = 0
-            for (const v of src) {
-              yield selector(v, c++)
-            }
-          }
-        }
-      }
+```typescript
+// helper function for making iterables from generator functions
+const toIterable = <T, TF extends () => IterableIterator<T>>(f: TF) => ({
+  [Symbol.iterator]: f
+})
 
-    const filter = <T>(pred: (v: T, i: number) => boolean) => (src: Iterable<T>): Iterable<T> => {
-      return {
-        [Symbol.iterator]: function* () {
-          let i = 0
-          for (const x of src) {
-            if (pred(x, i++)) {
-              yield x
-            }
-          }
-        }
+const _map = <T, TOut>(src: Iterable<T>, selector: (v: T, i: number) => TOut): Iterable<TOut> =>
+  toIterable(function*() {
+    let c = 0
+    for (const v of src) {
+      yield selector(v, c++)
+    }
+  })
+
+const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Iterable<T> =>
+  toIterable(function*() {
+    let i = 0
+    for (const x of src) {
+      if (pred(x, i++)) {
+        yield x
       }
     }
+  })
+```
 
-As can be seen, the `map` and `filter` functions above **return** unary functions.
+You've probably noticed that `_map` and `_filter` are not unary function so cannot be used in a pipe.
 
-    pipeValue([1, 2, 3])
-      .into(
-        filter(x => x % 2 === 1),
-        map(x => x * 2)
-      )
+We can use the provided `deferP0` method to transform these functions into functions that return a unary function (that takes a single parameter that was the first parameter of the original source function)
 
-Or if you want a re-useable pipe
+So it turns functions of the form
 
-    const oddMultipliedByTwo =
-        pipe(
-          // typescript can infer all other types when 
-          // we provide this input type annotation (number)
-          filter(x:number => x % 2 === 1), 
-          map(x => x * 2)
+    (src: TSrc, b: B, c: C, d: D) => R 
+    
+into functions of the form
+
+    (b: B, c: C, d: D) => (src: TSrc) => R
+
+So, to make a pipeable `map` function:
+
+```typescript
+const map = deferP0(_map)
+```
+
+Here, we transform the `_map` function with type 
+
+
+    <T, TOut>(src: Iterable<T>, selector: (v: T, i: number) => TOut): Iterable<TOut> 
+    
+into the generated `map` function which has the type 
+
+    <T, TOut>(selector: (v: T, i: number) => TOut) => (src: Iterable<T>): Iterable<TOut>
+
+As can be seen, we end up with a function that generates a **unary** function.
+
+We can do the same with `_filter`
+
+```typescript
+const filter = deferP0(_filter)
+```
+
+Now the `map` and `filter` functions that we generated above **return** unary functions and can be used in a pipe.
+
+Let's use them:
+
+```typescript
+const transformed = 
+  pipeValue([1, 2, 3])
+    .into(
+      filter(x => x % 2 === 1),  // x is inferred as number
+      map(x => x * 2)            // x is inferred as number
+    ) // iterable with values [2, 6]
+```
+
+Using `pipeValue`, we can pipe values through a single-use pip. If instead, we're looking for a re-useable pipe, we can use `pipe(...unaryFuncs)` or `typedPipe<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully:
+
+```typescript
+const oddNumbersMultipliedByTwoPipe =
+    // pipe is inferred as (src:Iterable<number>)=>Iterable<string>
+    pipe(
+      // typescript can infer all other types when 
+      // we provide this input type annotation (number)
+      filter(x:number => x % 2 === 1), 
+      map(x => x.toString()),   // x is inferred as number
+      map(x => x + " " + x)     // x is inferred as string
+    )
+```
+
+or, by making a pipe that expects the first function it contains to be of a specific type (using `typedPipe<T>`):
+
+```typescript
+    const oddNumbersMultipliedByTwoPipe =
+        typedPipe<Iterable<number>>()(
+          filter(x => x % 2 === 1),  // x is number
+          map(x => x.toString()),    // x is inferred as number
+          map(x => x + " " + x)      // x is inferred as string
         )
+```
 
-or, providing the input-type in a different way:
+In both cases, `oddNumbersMultipliedByTwoPipe` has the inferred type
 
-    const oddMultipliedByTwo =
-        typedPipe<number>()(
-          filter(x => x % 2 === 1), 
-          map(x => x * 2)
-        )
+    (src: Iterable<number>) => Iterable<string>
 
-which can be used:
+and when we use it...
 
-    const r = oddMultipliedByTwo([1, 2, 3]) 
-    const arr = [...r] // [2, 6]
+```typescript
+const r = oddMultipliedByTwo([1, 2, 3]) 
+// arr has type string[]
+const arr = [...r] // ["1 1", "2 2"]
+```
 
 ### acknowledgements
 
