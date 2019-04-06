@@ -58,7 +58,7 @@ const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Itera
   })
 ```
 
-You've probably noticed that `_map` and `_filter` are not unary function so cannot be used in a pipe.
+You've probably noticed that `_map` and `_filter` are not unary functions so cannot be used in a pipe.
 
 We can use the provided `deferP0` method to transform these functions into functions that return a unary function (that takes a single parameter that was the first parameter of the original source function)
 
@@ -106,7 +106,30 @@ const transformed =
     ) // iterable with values [2, 6]
 ```
 
-Using `pipeValue`, we can pipe values through a single-use pipe. 
+or
+
+```typescript
+const transformed = 
+  pipeInto(
+    [1, 2, 3],
+    filter(x => x % 2 === 1),  // x is inferred as number
+    map(x => x * 2)            // x is inferred as number
+  )
+```
+
+or (most minimally), use the `$p` alias for `pipeInto`
+
+```typescript
+const transformed = 
+  $p(
+    [1, 2, 3],
+    filter(x => x % 2 === 1),  // x is inferred as number
+    map(x => x * 2)            // x is inferred as number
+  )
+```
+
+`pipeValue(val).into(...)`, `pipeInto(val, ...)` or (most minimally) `$p(val, ...)`  , are functionally equivalent and can be used to push a value through a single-use pipe.
+
 
 If instead, we're looking for a re-useable pipe, we can use `pipe(...unaryFuncs)` or `typedPipe<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully. We can either use `pipe`
 
