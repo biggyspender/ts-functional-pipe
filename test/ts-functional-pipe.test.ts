@@ -1,4 +1,4 @@
-import { pipe, typedPipe, pipeValue } from '../src/ts-functional-pipe'
+import { pipe, typedPipe, pipeValue, $p } from '../src/ts-functional-pipe'
 import { toIterable } from './toIterable'
 import { deferP0 } from '../src/deferP0'
 
@@ -49,5 +49,7 @@ describe('ts-functional-pipe', () => {
     const q = oddMultipliedByTwo([1, 2, 3])
     expect([...q]).toEqual([2, 6])
     expect([...q]).toEqual([2, 6])
+
+    expect($p('chris', dinosaurify, sayHello)).toBe('Hello, chris-o-saurus!')
   })
 })
