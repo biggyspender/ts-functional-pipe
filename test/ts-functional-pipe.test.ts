@@ -1,4 +1,4 @@
-import { pipe, typedPipe, pipeValue, $p } from '../src/ts-functional-pipe'
+import { pipe, typedPipe, pipeValue, pp } from '../src/ts-functional-pipe'
 import { toIterable } from './toIterable'
 import { deferP0 } from '../src/deferP0'
 
@@ -31,9 +31,9 @@ describe('ts-functional-pipe', () => {
 
     expect([...pipeValue([1, 2, 3]).into(p)]).toEqual(['2', '4', '6'])
 
-    const pp = pipe(map((x: number) => (x * 2).toString()))
+    const mulStrPipe = pipe(map((x: number) => (x * 2).toString()))
 
-    expect([...pipeValue([1, 2, 3]).into(pp)]).toEqual(['2', '4', '6'])
+    expect([...pipeValue([1, 2, 3]).into(mulStrPipe)]).toEqual(['2', '4', '6'])
     expect([...pipeValue([1, 2, 3]).into(filter(x => x % 2 === 1))]).toEqual([1, 3])
     const dinosaurify = (name: string) => `${name}-o-saurus`
     const sayHello = (name: string) => `Hello, ${name}!`
@@ -50,6 +50,6 @@ describe('ts-functional-pipe', () => {
     expect([...q]).toEqual([2, 6])
     expect([...q]).toEqual([2, 6])
 
-    expect($p('chris', dinosaurify, sayHello)).toBe('Hello, chris-o-saurus!')
+    expect(pp('chris', dinosaurify, sayHello)).toBe('Hello, chris-o-saurus!')
   })
 })

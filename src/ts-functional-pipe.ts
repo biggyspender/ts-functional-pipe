@@ -159,4 +159,4 @@ export function pipeInto<TIn, TOut>(src: TIn, ...operations: UF<any, any>[]): TO
   return pipeImpl<TIn, TOut>(...operations)(src)
 }
 
-export const $p = pipeInto
+export const pp = pipeInto

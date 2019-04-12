@@ -122,18 +122,18 @@ const transformed =
   )
 ```
 
-or (most minimally), use the `$p` alias for `pipeInto`
+or (most minimally), use the `pp` alias for `pipeInto`
 
 ```typescript
 const transformed = 
-  $p(
+  pp(
     [1, 2, 3],
     filter(x => x % 2 === 1),  // x is inferred as number
     map(x => x * 2)            // x is inferred as number
   )
 ```
 
-`pipeValue(val).into(...)`, `pipeInto(val, ...)` or (most minimally) `$p(val, ...)`  , are functionally equivalent and can be used to push a value through a single-use pipe.
+`pipeValue(val).into(...)`, `pipeInto(val, ...)` or (most minimally) `pp(val, ...)`  , are functionally equivalent and can be used to push a value through a single-use pipe.
 
 
 If instead, we're looking for a re-useable pipe, we can use `pipe(...unaryFuncs)` or `typedPipe<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully. We can either use `pipe`
