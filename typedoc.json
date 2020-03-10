@@ -1,0 +1,7 @@
+{
+    "entryPoints": [
+        "src/ts-functional-pipe.ts"
+    ],
+    "out": "docs",
+    "theme": "default"
+}
