@@ -11,11 +11,12 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declarationDir": "dist/types",
-    "outDir": "dist/lib",
+    "outDir": "build",
     "typeRoots": [
       "node_modules/@types"
     ],
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "importHelpers": true
   },
   "include": [
     "src"
