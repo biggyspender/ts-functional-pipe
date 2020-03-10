@@ -1,4 +1,4 @@
-import { deferP0 } from '../src/deferP0'
+import { deferP0 } from '../src/ts-functional-pipe'
 import { toIterable } from './toIterable'
 
 function add(a: string, b: number, c: boolean): number {
@@ -6,7 +6,7 @@ function add(a: string, b: number, c: boolean): number {
 }
 
 function app<T>(src: Iterable<T>, item: T): Iterable<T> {
-  return toIterable(function*() {
+  return toIterable(function* () {
     for (const s of src) {
       yield s
     }
