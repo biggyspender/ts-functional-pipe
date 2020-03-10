@@ -34,7 +34,10 @@
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
     "commit": "git-cz",
     "semantic-release": "semantic-release",
-    "semantic-release-prepare": "ts-node tools/semantic-release-prepare"
+    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
+    "generate-functions:pipe": "ts-node tools/codeGeneration pipe pipe 64 > src/pipe.ts",
+    "generate-functions:compose": "ts-node tools/codeGeneration compose compose 64 > src/compose.ts",
+    "generate-functions": "npm run generate-functions:pipe && npm run generate-functions:compose"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
