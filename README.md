@@ -1,9 +1,22 @@
-# Type-safe, functional-style pipe functions for typescript
+# Type-safe function composition for Typescript
 
-In the absence of |> (the pipe operator) it's useful to have a type-safe pipe function that can compose an a large (up to 32) number of unary functions. This minimal library contains a few different helper functions for this purpose.
+## A micro-library for functional composition
+
+In the absence of `|>` (the pipe operator) it's useful to have a type-safe pipe function that can compose an a large (up to 64) number of unary functions. This minimal library contains a few different helper functions for this purpose.
 
 [![npm version](http://img.shields.io/npm/v/ts-functional-pipe.svg?style=flat)](https://npmjs.org/package/ts-functional-pipe "View this project on npm")
 [![Build Status](https://travis-ci.org/biggyspender/ts-functional-pipe.svg?branch=master)](https://travis-ci.org/biggyspender/ts-functional-pipe)
+
+> NOTE
+> ---
+> 
+> Versions <=2.x erroneously used the term `compose` for left-to-right function composition. v3 is a major overhaul of this library and contains several breaking changes, both in the code, and in the meaning of `compose`. 
+>
+> These are version >=3 documents. Please find v2.x documentation [here](https://github.com/biggyspender/ts-functional-pipe/tree/v2.1.1)
+
+## Requirements
+
+This library makes use of [leading/middle rest elements](https://devblogs.microsoft.com/typescript/announcing-typescript-4-2/#non-trailing-rests), introduced in **Typescript version 4.2**
 
 ## Usage
 
@@ -17,7 +30,7 @@ const sayHello = (name:string) => `Hello, ${name}!`
 We can compose these functions into a single function using the compose function:
 
 ```typescript
-const sayHelloToDinosaur = compose(dinosaurify, sayHello)
+const sayHelloToDinosaur = compose(sayHello, dinosaurify)
 ```
 
 and call it
@@ -26,10 +39,18 @@ and call it
 sayHelloToDinosaur("mike") // "Hello, mike-o-saurus!"
 ```
 
+Note that with `compose`, function composition occurs from *right-to-left*. 
+
+The `pipe` function composes its parameters from *left-to-right*, so the equivalent `pipe` version of the code above would be:
+
+```typescript
+const sayHelloToDinosaur_withPipe = pipe(dinosaurify, sayHello)
+```
+
 Alternatively, we could have called
 
 ```typescript
-pipeValue("mike").into(dinosaurify, sayHello) // "Hello, mike-o-saurus!"
+applyArgs("mike").to(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
 ```
 
 ### OK, great, but... Why?
@@ -63,7 +84,7 @@ const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Itera
   })
 ```
 
-You've probably noticed that `_map` and `_filter` are not unary functions so cannot be used in a pipe/compose.
+Here, the `_map` and `_filter` are not unary functions so cannot be used in a pipe/compose.
 
 We can use the provided `deferP0` method to transform these functions into functions that return a unary function (that takes a single parameter that was the first parameter of the original source function)
 
@@ -75,7 +96,7 @@ into functions of the form
 
     (b: B, c: C, d: D) => (src: TSrc) => R
 
-So, to make a pipeable `map` function:
+So, to make a composable `map` function:
 
 ```typescript
 const map = deferP0(_map)
@@ -98,50 +119,26 @@ We can do the same with `_filter`
 const filter = deferP0(_filter)
 ```
 
-Now the `map` and `filter` functions that we generated above **return** unary functions and can be used in a pipe/compose.
+Now the `map` and `filter` functions that we generated above **return** unary functions and can be used in a pipe/compose with type inference "flowing" through the composed functions.
 
 Let's use them:
 
 ```typescript
 const transformed = 
-  pipeValue([1, 2, 3])
-    .into(
+  applyArgs([1, 2, 3]).to(
+    pipe(
       filter(x => x % 2 === 1),  // x is inferred as number
       map(x => x * 2)            // x is inferred as number
-    ) // iterable with values [2, 6]
+    )
+  ) // iterable with values [2, 6]
 ```
 
-or
-
-```typescript
-const transformed = 
-  pipeInto(
-    [1, 2, 3],
-    filter(x => x % 2 === 1),  // x is inferred as number
-    map(x => x * 2)            // x is inferred as number
-  )
-```
-
-or (most minimally), use the `pp` alias for `pipeInto`
-
-```typescript
-const transformed = 
-  pp(
-    [1, 2, 3],
-    filter(x => x % 2 === 1),  // x is inferred as number
-    map(x => x * 2)            // x is inferred as number
-  )
-```
-
-`pipeValue(val).into(...)`, `pipeInto(val, ...)` or (most minimally) `pp(val, ...)`  , are functionally equivalent and can be used to push a value through a single-use pipe.
-
-
-If instead, we're looking for a re-useable function composed of multiple functions, we can use `compose(...unaryFuncs)` or `typedCompose<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully. We can either use `compose`
+Without the `applyArgs` helper, we might want a re-useable function composed of multiple functions, so we can use `compose(...unaryFuncs)` or `pipe(...unaryFuncs)` on their own... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully:
 
 ```typescript
 const oddNumbersMultipliedByTwo =
     // pipe is inferred as (src:Iterable<number>)=>Iterable<string>
-    compose(
+    pipe(
       // typescript can infer all other types when 
       // we provide this input type annotation (number)
       filter(x:number => x % 2 === 1), 
@@ -150,18 +147,7 @@ const oddNumbersMultipliedByTwo =
     )
 ```
 
-or create a typed composition function that expects the first function it contains to have a parameter of a specific type (using `typedCompose<T>()`):
-
-```typescript
-    const oddNumbersMultipliedByTwo =
-        typedCompose<Iterable<number>>()( 
-          filter(x => x % 2 === 1),  // x is number
-          map(x => x.toString()),    // x is inferred as number
-          map(x => x + " " + x)      // x is inferred as string
-        )
-```
-
-In both cases, `oddNumbersMultipliedByTwoPipe` has the inferred type
+So `oddNumbersMultipliedByTwoPipe` has the inferred type
 
     (src: Iterable<number>) => Iterable<string>
 
@@ -172,6 +158,8 @@ const r = oddMultipliedByTwo([1, 2, 3])
 // arr has type string[]
 const arr = [...r] // ["1 1", "2 2"]
 ```
+
+`arr` has type string[]
 
 ### acknowledgements
 
