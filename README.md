@@ -47,15 +47,26 @@ The `pipe` function composes its parameters from *left-to-right*, so the equival
 const sayHelloToDinosaur_withPipe = pipe(dinosaurify, sayHello)
 ```
 
-Alternatively, we could have called
+### The `applyArgs` helper
+
+Alternatively, we could have called the `applyArgs` helper, which is useful for ensuring that type inference flows inutitively through the composed functions. This makes more sense later when we start using it with (apparently) untyped arrow functions.
 
 ```typescript
 applyArgs("mike").to(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
 ```
 
-### OK, great, but... Why?
+or, less verbosely:
+
+```typescript
+applyArgs("mike")(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
+```
+
+
+## In depth
 
 Pipes work with **unary**-functions, using the return value of one function as the only parameter to the next function.
+
+### Defining higher-order unary map and filter functions
 
 Say we create our own versions the Array map and filter functions to work over `Iterable<T>`
 
@@ -86,6 +97,8 @@ const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Itera
 
 Here, the `_map` and `_filter` are not unary functions so cannot be used in a pipe/compose.
 
+### Convert functions to unary with `deferP0`
+
 We can use the provided `deferP0` method to transform these functions into functions that return a unary function (that takes a single parameter that was the first parameter of the original source function)
 
 So it turns functions of the form
@@ -95,6 +108,8 @@ So it turns functions of the form
 into functions of the form
 
     (b: B, c: C, d: D) => (src: TSrc) => R
+
+### Functions that return unary functions
 
 So, to make a composable `map` function:
 
@@ -121,7 +136,9 @@ const filter = deferP0(_filter)
 
 Now the `map` and `filter` functions that we generated above **return** unary functions and can be used in a pipe/compose with type inference "flowing" through the composed functions.
 
-Let's use them:
+### Composing `map` and `filter` with `pipe`
+
+Let's use them with the `pipe` and the `applyArgs` helper (so that type information propagates through all the function parameters)
 
 ```typescript
 const transformed = 
@@ -133,7 +150,7 @@ const transformed =
   ) // iterable with values [2, 6]
 ```
 
-Without the `applyArgs` helper, we might want a re-useable function composed of multiple functions, so we can use `compose(...unaryFuncs)` or `pipe(...unaryFuncs)` on their own... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully:
+When using "untyped" arrow functions, as above, by using the `applyArgs` helper, we can see how types are propagated through the functions without needing to provide types for any function parameters. However, we might just want a re-useable function composed of multiple functions, so we can use `compose(...unaryFuncs)` or `pipe(...unaryFuncs)` on their own... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully:
 
 ```typescript
 const oddNumbersMultipliedByTwo =
