@@ -3,6 +3,7 @@
   "version": "0.0.0-development",
   "description": "",
   "keywords": [],
+  "sideEffects": false,
   "main": "dist/ts-functional-pipe.umd.js",
   "module": "dist/ts-functional-pipe.es5.js",
   "typings": "dist/types/ts-functional-pipe.d.ts",
@@ -31,7 +32,7 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
-    "travis-deploy-once": "travis-deploy-once"
+    "travis-deploy-once": "travis-deploy-once --pro"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -105,7 +106,7 @@
     "rollup-plugin-node-resolve": "^4.1.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.20.1",
-    "semantic-release": "^15.13.3",
+    "semantic-release": "^17.0.4",
     "shelljs": "^0.8.3",
     "travis-deploy-once": "^5.0.11",
     "ts-jest": "^24.0.1",
