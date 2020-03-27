@@ -1,4 +1,4 @@
-import { pipe, typedPipe, pipeValue, pp, compose } from '../src/ts-functional-pipe'
+import { pipe, typedPipe, pipeValue, pp, compose, typedCompose } from '../src/ts-functional-pipe'
 import { toIterable } from './toIterable'
 import { deferP0 } from '../src/deferP0'
 
@@ -25,25 +25,25 @@ const filter = deferP0(_filter)
 const toArray = <T>(v: Iterable<T>) => [...v]
 
 describe('ts-functional-pipe', () => {
-  const tp = typedPipe<Iterable<number>>()
+  const tp = typedCompose<Iterable<number>>()
   const p = tp(map(x => (x * 2).toString()))
   it('pipes', () => {
     expect([...p([1, 2, 3])]).toEqual(['2', '4', '6'])
 
     expect([...pipeValue([1, 2, 3]).into(p)]).toEqual(['2', '4', '6'])
 
-    const mulStrPipe = pipe(map((x: number) => (x * 2).toString()))
+    const mulStrPipe = compose(map((x: number) => (x * 2).toString()))
 
     expect([...pipeValue([1, 2, 3]).into(mulStrPipe)]).toEqual(['2', '4', '6'])
     expect([...pipeValue([1, 2, 3]).into(filter(x => x % 2 === 1))]).toEqual([1, 3])
     const dinosaurify = (name: string) => `${name}-o-saurus`
     const sayHello = (name: string) => `Hello, ${name}!`
-    const sayHelloToDinosaur = pipe(
+    const sayHelloToDinosaur = compose(
       dinosaurify,
       sayHello
     )
     expect(sayHelloToDinosaur('mike')).toBe('Hello, mike-o-saurus!')
-    const oddMultipliedByTwo = typedPipe<Iterable<number>>()(
+    const oddMultipliedByTwo = typedCompose<Iterable<number>>()(
       filter(x => x % 2 === 1),
       map(x => x * 2)
     )

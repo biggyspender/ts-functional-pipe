@@ -14,10 +14,10 @@ const dinosaurify = (name:string) => `${name}-o-saurus`
 const sayHello = (name:string) => `Hello, ${name}!`
 ```
 
-We can compose these functions into a single function using the pipe function:
+We can compose these functions into a single function using the compose function:
 
 ```typescript
-const sayHelloToDinosaur = pipe(dinosaurify, sayHello)
+const sayHelloToDinosaur = compose(dinosaurify, sayHello)
 ```
 
 and call it
@@ -63,7 +63,7 @@ const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Itera
   })
 ```
 
-You've probably noticed that `_map` and `_filter` are not unary functions so cannot be used in a pipe.
+You've probably noticed that `_map` and `_filter` are not unary functions so cannot be used in a pipe/compose.
 
 We can use the provided `deferP0` method to transform these functions into functions that return a unary function (that takes a single parameter that was the first parameter of the original source function)
 
@@ -98,7 +98,7 @@ We can do the same with `_filter`
 const filter = deferP0(_filter)
 ```
 
-Now the `map` and `filter` functions that we generated above **return** unary functions and can be used in a pipe.
+Now the `map` and `filter` functions that we generated above **return** unary functions and can be used in a pipe/compose.
 
 Let's use them:
 
@@ -136,12 +136,12 @@ const transformed =
 `pipeValue(val).into(...)`, `pipeInto(val, ...)` or (most minimally) `pp(val, ...)`  , are functionally equivalent and can be used to push a value through a single-use pipe.
 
 
-If instead, we're looking for a re-useable pipe, we can use `pipe(...unaryFuncs)` or `typedPipe<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully. We can either use `pipe`
+If instead, we're looking for a re-useable function composed of multiple functions, we can use `compose(...unaryFuncs)` or `typedCompose<T>(...unaryFuncs)`... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully. We can either use `compose`
 
 ```typescript
-const oddNumbersMultipliedByTwoPipe =
+const oddNumbersMultipliedByTwo =
     // pipe is inferred as (src:Iterable<number>)=>Iterable<string>
-    pipe(
+    compose(
       // typescript can infer all other types when 
       // we provide this input type annotation (number)
       filter(x:number => x % 2 === 1), 
@@ -150,11 +150,11 @@ const oddNumbersMultipliedByTwoPipe =
     )
 ```
 
-or make a pipe that expects the first function it contains to have a parameter of a specific type (using `typedPipe<T>`):
+or create a typed composition function that expects the first function it contains to have a parameter of a specific type (using `typedCompose<T>()`):
 
 ```typescript
-    const oddNumbersMultipliedByTwoPipe =
-        typedPipe<Iterable<number>>()(
+    const oddNumbersMultipliedByTwo =
+        typedCompose<Iterable<number>>()( 
           filter(x => x % 2 === 1),  // x is number
           map(x => x.toString()),    // x is inferred as number
           map(x => x + " " + x)      // x is inferred as string
