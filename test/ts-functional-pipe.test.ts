@@ -1,4 +1,4 @@
-import { pipe, typedPipe, pipeValue, pp } from '../src/ts-functional-pipe'
+import { pipe, typedPipe, pipeValue, pp, compose } from '../src/ts-functional-pipe'
 import { toIterable } from './toIterable'
 import { deferP0 } from '../src/deferP0'
 
@@ -22,6 +22,7 @@ const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Itera
 
 const map = deferP0(_map)
 const filter = deferP0(_filter)
+const toArray = <T>(v: Iterable<T>) => [...v]
 
 describe('ts-functional-pipe', () => {
   const tp = typedPipe<Iterable<number>>()
@@ -51,5 +52,12 @@ describe('ts-functional-pipe', () => {
     expect([...q]).toEqual([2, 6])
 
     expect(pp('chris', dinosaurify, sayHello)).toBe('Hello, chris-o-saurus!')
+
+    const composedFuncs = compose(
+      filter((x: number) => x % 2 === 0),
+      map(x => '$' + x),
+      toArray
+    )
+    expect(composedFuncs([1, 2, 3, 4])).toEqual(['$2', '$4'])
   })
 })
