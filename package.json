@@ -36,8 +36,9 @@
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "generate-functions:pipe": "ts-node tools/codeGeneration pipe pipe 64 > src/pipe.ts",
+    "generate-functions:pipeInto": "ts-node tools/codeGeneration pipeInto pipeInto 64 > src/pipeInto.ts",
     "generate-functions:compose": "ts-node tools/codeGeneration compose compose 64 > src/compose.ts",
-    "generate-functions": "npm run generate-functions:pipe && npm run generate-functions:compose"
+    "generate-functions": "npm run generate-functions:pipe && npm run generate-functions:compose && npm run generate-functions:pipeInto"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [

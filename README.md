@@ -61,6 +61,14 @@ or, less verbosely:
 applyArgs("mike")(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
 ```
 
+### `pipeInto` function
+
+This is shorthand to combine the `applyArgs` helper with `pipe`, reducing the amount of boilerplate. Using `pipeInto` we can rewrite the above as:
+
+```typescript
+pipeInto("mike", dinosaurify, sayHello)
+```
+
 
 ## In depth
 
