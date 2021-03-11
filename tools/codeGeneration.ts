@@ -6,7 +6,25 @@ const rangeGenerator = function* (start: number, count: number) {
 
 const range = (start: number, count: number): number[] => [...rangeGenerator(start, count)];
 
-//function _pipe<TIn extends any[], T1, T2, TOut>(f1: Func<TIn, T1>, f2: UnaryFunction<T1, T2>, f3: UnaryFunction<T2, TOut>): Func<TIn, TOut>
+const comments = {
+    pipe: `/**
+ * Type-enforcing left-to-right function composition function.
+ * The first parameter can be a function of any arity, but the remaining parameters must be unary functions.
+ * The return type of one function must be compatible with the argument of next function in the argument list
+ * (i.e. types flow from left-to-right)
+ * @returns A function with the arguments of the *first* function in the argument list and a return type of the *last* function in the argument list
+ */`,
+    compose: `/**
+ * Type-enforcing right-to-left function composition function.
+ * The last parameter (i.e. the first function to be evaluated) in the argument list can be a function of any arity, but the remaining parameters must be unary functions.
+ * The return type of one function must be compatible with the argument of previous function in the argument list
+ * (i.e. types flow from right-to-left)
+ * @returns A function with the arguments of the last function in the argument list and a return type of the first function in the argument list
+ */`,
+    pipeInto: `/**
+ * \`pipeInto(src, f1, f2)\` is shorthand for \`applyArgs(src).to(pipe(f1, f2))\`
+ */`
+}
 
 const getLines =
     (name: string, type: "pipe" | "compose" | "pipeInto", numOverloads: number) => {
@@ -14,7 +32,9 @@ const getLines =
             "import { Func } from './types/Func';",
             "import { UnaryFunction } from './types/UnaryFunction';",
             "import { pipeImpl } from './pipeImpl';",
+            [...(type === "pipeInto" ? ["import { applyArgs } from './applyArgs'"] : [])],
             "",
+            comments[type],
             ...range(0, numOverloads).map(n => {
                 const functionAndGenericDecl = `export function ${name}<${type === "pipeInto" ? "TIn" : "TIn extends any[]"}, ${[...range(1, n).map(n => `T${n}`), "TOut"].join(", ")}>`;
                 const parameterTypeList =
@@ -40,7 +60,7 @@ const getLines =
             [...(type === "pipe"
                 ? ["return pipeImpl(o1, ...operations)"]
                 : type === "pipeInto"
-                    ? ["return pipeImpl(o1, ...operations)(src) as TOut"]
+                    ? ["return applyArgs(src).to(pipeImpl(o1, ...operations))"]
                     : [
                         "const o1 = args[args.length - 1] as Func<TIn, any>;",
                         "const operations = args.slice(0, -1).reverse() as UnaryFunction<any, any>[];",

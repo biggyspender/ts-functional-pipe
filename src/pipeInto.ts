@@ -1,6 +1,7 @@
 import { Func } from './types/Func'
 import { UnaryFunction } from './types/UnaryFunction'
 import { pipeImpl } from './pipeImpl'
+import { applyArgs } from './applyArgs'
 
 /**
  * `pipeInto(src, f1, f2)` is shorthand for `applyArgs(src).to(pipe(f1, f2))`
@@ -4337,5 +4338,5 @@ export function pipeInto<TIn, TOut>(
   o1: Func<[TIn], any>,
   ...operations: UnaryFunction<any, any>[]
 ): TOut {
-  return pipeImpl(o1, ...operations)(src) as TOut
+  return applyArgs(src).to(pipeImpl(o1, ...operations))
 }
