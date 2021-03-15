@@ -1,8 +1,17 @@
 {
   "name": "ts-functional-pipe",
   "version": "0.0.0-development",
-  "description": "",
-  "keywords": [],
+  "description": "Heavily overloaded functions (pipe/compose) for type-safe function composition in TypeScript",
+  "keywords": [
+    "typescript",
+    "javascript",
+    "pipe",
+    "type-safe",
+    "compose",
+    "function-composition",
+    "point-free",
+    "composed-functions"
+  ],
   "sideEffects": false,
   "main": "dist/ts-functional-pipe.umd.js",
   "module": "dist/ts-functional-pipe.es5.js",
