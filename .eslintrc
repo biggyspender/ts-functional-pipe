@@ -1,0 +1,25 @@
+{
+    "root": true,
+    "extends": "airbnb-typescript/base",
+    "plugins": [
+        "import",
+        "prettier"
+    ],
+    "parserOptions": {
+        "project": "./tsconfig.eslint.json",
+    },
+    "rules": {
+        "import/no-extraneous-dependencies": 0,
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "variable",
+                "format": [
+                    "camelCase",
+                    "UPPER_CASE"
+                ],
+                "leadingUnderscore": "allow"
+            }
+        ]
+    }
+}

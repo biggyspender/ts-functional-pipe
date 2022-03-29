@@ -6,7 +6,9 @@
  * The return type of this method will match the return type of `f`
  */
 export const applyArgs = <A extends any[]>(...args: A) => {
-  const f = (<R>(f: (...args: A) => R): R => f(...args)) as To<A>
+  type Fun<R> = (...a: A) => R
+
+  const f = (<R>(fun: Fun<R>): R => fun(...args)) as To<A>
   f.to = f
   return f
 }
