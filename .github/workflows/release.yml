@@ -19,17 +19,17 @@ jobs:
     - name: Install dependencies
       run: npx ci
     - name: Install semantic-release extra plugins
-      run: npm install --save-dev @semantic-release/changelog @semantic-release/git      
+      run: npm install --save-dev @semantic-release/changelog @semantic-release/git
     - name: Lint
       run: npm run lint
     - name: Test
       run: npm run test -- --no-cache
     - name: Build
-      run: npm run build      
+      run: npm run build
     - name: Build docs
-      run: npm run build-docs    
+      run: npm run build-docs
     - name: Deploy docs
-      run: npm run deploy-docs    
+      run: npm run deploy-docs
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
