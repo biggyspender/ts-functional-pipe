@@ -29,6 +29,8 @@ jobs:
     - name: Build docs
       run: npm run build-docs
     - name: Deploy docs
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: npm run deploy-docs
     - name: Release
       env:

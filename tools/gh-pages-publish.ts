@@ -1,4 +1,4 @@
-const { cd, exec, echo, touch,env } = require("shelljs")
+const { cd, exec, echo, touch } = require("shelljs")
 const { readFileSync } = require("fs")
 const url = require("url")
 
@@ -17,7 +17,6 @@ let parsedUrl = url.parse(repoUrl)
 let repository = (parsedUrl.host || "") + (parsedUrl.path || "")
 let ghToken = process.env.GITHUB_TOKEN
 
-env["GITHUB_TOKEN"]
 echo("Deploying docs!!!")
 cd("docs")
 touch(".nojekyll")
@@ -26,7 +25,6 @@ exec("git add .")
 exec('git config user.name "Chris Sperry"')
 exec('git config user.email "biggyspender@users.noreply.github.com"')
 exec('git commit -m "docs(docs): update gh-pages"')
-echo(`git push --force --quiet "https://${ghToken}@${repository}" master:gh-pages`)
 exec(
   `git push --force --quiet "https://${ghToken}@${repository}" master:gh-pages`
 )
