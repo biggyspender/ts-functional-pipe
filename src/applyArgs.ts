@@ -6,14 +6,14 @@
  * The return type of this method will match the return type of `f`
  */
 export const applyArgs = <A extends any[]>(...args: A) => {
-  type Fun<R> = (...a: A) => R
+    type Fun<R> = (...a: A) => R
 
-  const f = (<R>(fun: Fun<R>): R => fun(...args)) as To<A>
-  f.to = f
-  return f
+    const f = (<R>(fun: Fun<R>): R => fun(...args)) as To<A>
+    f.to = f
+    return f
 }
 
 interface To<A extends any[]> {
-  <R>(f: (...args: A) => R): R
-  to<R>(f: (...args: A) => R): R
+    <R>(f: (...args: A) => R): R
+    to<R>(f: (...args: A) => R): R
 }
