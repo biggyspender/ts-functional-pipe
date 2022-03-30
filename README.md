@@ -4,13 +4,12 @@
 
 In the absence of `|>` (the pipe operator) it's useful to have a type-safe pipe function that can compose an a large (up to 64) number of unary functions. This minimal library contains a few different helper functions for this purpose.
 
-[![npm version](http://img.shields.io/npm/v/ts-functional-pipe.svg?style=flat)](https://npmjs.org/package/ts-functional-pipe "View this project on npm")
-[![Build Status](https://travis-ci.org/biggyspender/ts-functional-pipe.svg?branch=master)](https://travis-ci.org/biggyspender/ts-functional-pipe)
+[![npm version](http://img.shields.io/npm/v/ts-functional-pipe.svg?style=flat)](https://npmjs.org/package/ts-functional-pipe 'View this project on npm')
+[![Release](https://github.com/biggyspender/ts-functional-pipe/actions/workflows/release.yml/badge.svg)](https://github.com/biggyspender/ts-functional-pipe/actions/workflows/release.yml)
 
-> NOTE
-> ---
-> 
-> Versions <=2.x erroneously used the term `compose` for left-to-right function composition. v3 is a major overhaul of this library and contains several breaking changes, both in the code, and in the meaning of `compose`. 
+> ## NOTE
+>
+> Versions <=2.x erroneously used the term `compose` for left-to-right function composition. v3 is a major overhaul of this library and contains several breaking changes, both in the code, and in the meaning of `compose`.
 >
 > These are version >=3 documents. Please find v2.x documentation [here](https://github.com/biggyspender/ts-functional-pipe/tree/v2.1.1)
 
@@ -23,8 +22,8 @@ This library makes use of [leading/middle rest elements](https://devblogs.micros
 Suppose we have the following unary functions:
 
 ```typescript
-const dinosaurify = (name:string) => `${name}-o-saurus`
-const sayHello = (name:string) => `Hello, ${name}!`
+const dinosaurify = (name: string) => `${name}-o-saurus`
+const sayHello = (name: string) => `Hello, ${name}!`
 ```
 
 We can compose these functions into a single function using the compose function:
@@ -36,12 +35,12 @@ const sayHelloToDinosaur = compose(sayHello, dinosaurify)
 and call it
 
 ```typescript
-sayHelloToDinosaur("mike") // "Hello, mike-o-saurus!"
+sayHelloToDinosaur('mike') // "Hello, mike-o-saurus!"
 ```
 
-Note that with `compose`, function composition occurs from *right-to-left*. 
+Note that with `compose`, function composition occurs from _right-to-left_.
 
-The `pipe` function composes its parameters from *left-to-right*, so the equivalent `pipe` version of the code above would be:
+The `pipe` function composes its parameters from _left-to-right_, so the equivalent `pipe` version of the code above would be:
 
 ```typescript
 const sayHelloToDinosaur_withPipe = pipe(dinosaurify, sayHello)
@@ -52,13 +51,13 @@ const sayHelloToDinosaur_withPipe = pipe(dinosaurify, sayHello)
 Alternatively, we could have called the `applyArgs` helper, which is useful for ensuring that type inference flows inutitively through the composed functions. This makes more sense later when we start using it with (apparently) untyped arrow functions.
 
 ```typescript
-applyArgs("mike").to(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
+applyArgs('mike').to(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
 ```
 
 or, less verbosely:
 
 ```typescript
-applyArgs("mike")(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
+applyArgs('mike')(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
 ```
 
 ### `pipeInto` function
@@ -66,9 +65,8 @@ applyArgs("mike")(pipe(dinosaurify, sayHello)) // "Hello, mike-o-saurus!"
 This is shorthand to combine the `applyArgs` helper with `pipe`, reducing the amount of boilerplate. Using `pipeInto` we can rewrite the above as:
 
 ```typescript
-pipeInto("mike", dinosaurify, sayHello)
+pipeInto('mike', dinosaurify, sayHello)
 ```
-
 
 ## In depth
 
@@ -81,26 +79,26 @@ Say we create our own versions the Array map and filter functions to work over `
 ```typescript
 // helper function for making iterables from generator functions
 const toIterable = <T, TF extends () => IterableIterator<T>>(f: TF) => ({
-  [Symbol.iterator]: f
+    [Symbol.iterator]: f,
 })
 
 const _map = <T, TOut>(src: Iterable<T>, selector: (v: T, i: number) => TOut): Iterable<TOut> =>
-  toIterable(function*() {
-    let c = 0
-    for (const v of src) {
-      yield selector(v, c++)
-    }
-  })
+    toIterable(function* () {
+        let c = 0
+        for (const v of src) {
+            yield selector(v, c++)
+        }
+    })
 
 const _filter = <T>(src: Iterable<T>, pred: (v: T, i: number) => boolean): Iterable<T> =>
-  toIterable(function*() {
-    let i = 0
-    for (const x of src) {
-      if (pred(x, i++)) {
-        yield x
-      }
-    }
-  })
+    toIterable(function* () {
+        let i = 0
+        for (const x of src) {
+            if (pred(x, i++)) {
+                yield x
+            }
+        }
+    })
 ```
 
 Here, the `_map` and `_filter` are not unary functions so cannot be used in a pipe/compose.
@@ -111,8 +109,8 @@ We can use the provided `deferP0` method to transform these functions into funct
 
 So it turns functions of the form
 
-    (src: TSrc, b: B, c: C, d: D) => R 
-    
+    (src: TSrc, b: B, c: C, d: D) => R
+
 into functions of the form
 
     (b: B, c: C, d: D) => (src: TSrc) => R
@@ -125,12 +123,11 @@ So, to make a composable `map` function:
 const map = deferP0(_map)
 ```
 
-Here, we transform the `_map` function with type 
+Here, we transform the `_map` function with type
 
+    <T, TOut>(src: Iterable<T>, selector: (v: T, i: number) => TOut): Iterable<TOut>
 
-    <T, TOut>(src: Iterable<T>, selector: (v: T, i: number) => TOut): Iterable<TOut> 
-    
-into the generated `map` function which has the type 
+into the generated `map` function which has the type
 
     <T, TOut>(selector: (v: T, i: number) => TOut) => (src: Iterable<T>): Iterable<TOut>
 
@@ -149,13 +146,12 @@ Now the `map` and `filter` functions that we generated above **return** unary fu
 Let's use them with the `pipe` and the `applyArgs` helper (so that type information propagates through all the function parameters)
 
 ```typescript
-const transformed = 
-  applyArgs([1, 2, 3]).to(
+const transformed = applyArgs([1, 2, 3]).to(
     pipe(
-      filter(x => x % 2 === 1),  // x is inferred as number
-      map(x => x * 2)            // x is inferred as number
+        filter((x) => x % 2 === 1), // x is inferred as number
+        map((x) => x * 2) // x is inferred as number
     )
-  ) // iterable with values [2, 6]
+) // iterable with values [2, 6]
 ```
 
 When using "untyped" arrow functions, as above, by using the `applyArgs` helper, we can see how types are propagated through the functions without needing to provide types for any function parameters. However, we might just want a re-useable function composed of multiple functions, so we can use `compose(...unaryFuncs)` or `pipe(...unaryFuncs)` on their own... but we'll need to supply type-information, usually in just one place, so that typescript can infer other types successfully:
@@ -164,9 +160,9 @@ When using "untyped" arrow functions, as above, by using the `applyArgs` helper,
 const oddNumbersMultipliedByTwo =
     // pipe is inferred as (src:Iterable<number>)=>Iterable<string>
     pipe(
-      // typescript can infer all other types when 
+      // typescript can infer all other types when
       // we provide this input type annotation (number)
-      filter(x:number => x % 2 === 1), 
+      filter(x:number => x % 2 === 1),
       map(x => x.toString()),   // x is inferred as number
       map(x => x + " " + x)     // x is inferred as string
     )
@@ -179,7 +175,7 @@ So `oddNumbersMultipliedByTwoPipe` has the inferred type
 and when we use it...
 
 ```typescript
-const r = oddMultipliedByTwo([1, 2, 3]) 
+const r = oddMultipliedByTwo([1, 2, 3])
 // arr has type string[]
 const arr = [...r] // ["1 1", "2 2"]
 ```
