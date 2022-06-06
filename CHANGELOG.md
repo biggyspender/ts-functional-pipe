@@ -1,3 +1,10 @@
+# [4.0.0-beta.2](https://github.com/biggyspender/ts-functional-pipe/compare/v4.0.0-beta.1...v4.0.0-beta.2) (2022-06-06)
+
+
+### Performance Improvements
+
+* **compose:** reimplement compose for better perf ([2bebb6e](https://github.com/biggyspender/ts-functional-pipe/commit/2bebb6ec3507e75f7e0347718ce1c6b023ca05d2))
+
 # [4.0.0-beta.1](https://github.com/biggyspender/ts-functional-pipe/compare/v3.1.2...v4.0.0-beta.1) (2022-03-30)
 
 
