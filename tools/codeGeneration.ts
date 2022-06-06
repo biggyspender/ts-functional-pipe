@@ -4,7 +4,7 @@ const rangeGenerator = function* (start: number, count: number) {
     }
 }
 
-const range = (start: number, count: number): number[] => [...rangeGenerator(start, count)]
+const range = (start: number, count: number): number[] => Array.from(rangeGenerator(start, count))
 
 const comments = {
     pipe: `/**
@@ -70,13 +70,17 @@ const getLines = (name: string, type: 'pipe' | 'compose' | 'pipeInto', numOverlo
             : `export function ${name}<TIn extends any[], TOut>(...args: [...operations: UnaryFunction<any, any>[], o1: Func<TIn, any>]): Func<TIn, TOut> {`,
         [
             ...(type === 'pipe'
-                ? ['return pipeImpl(o1, ...operations)']
+                ? [
+                      'return pipeImpl.bind(void 0, o1 as any).apply(void 0, operations) as Func<TIn, TOut>',
+                  ]
                 : type === 'pipeInto'
-                ? ['return applyArgs(src).to(pipeImpl(o1, ...operations))']
+                ? [
+                      'return applyArgs(src).to(pipeImpl.bind(void 0, o1).apply(void 0, operations)) as TOut',
+                  ]
                 : [
                       //   'const o1 = args[args.length - 1] as Func<TIn, any>;',
                       //   'const operations = args.slice(0, -1) as UnaryFunction<any, any>[];',
-                      'return composeImpl(...args);',
+                      'return (composeImpl as any).apply(void 0, args) as Func<TIn, TOut>',
                   ]
             ).map((v) => `    ${v}`),
         ].join('\n'),

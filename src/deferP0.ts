@@ -15,5 +15,6 @@ export const deferP0 =
     <A extends readonly unknown[], R>(fn: (...args: A) => R) =>
     (...args: Tail<A>) =>
     (...src: HeadAsTuple<A>): R => {
-        return fn(...(src.concat(args) as unknown as A))
+        return (fn as any).apply(void 0, src.concat(args) as unknown as A)
+        //return fn(...(src.concat(args) as unknown as A))
     }

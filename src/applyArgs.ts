@@ -8,7 +8,7 @@
 export const applyArgs = <A extends any[]>(...args: A) => {
     type Fun<R> = (...a: A) => R
 
-    const f = (<R>(fun: Fun<R>): R => fun(...args)) as To<A>
+    const f = (<R>(fun: Fun<R>): R => fun.apply(void 0, args)) as To<A>
     f.to = f
     return f
 }
