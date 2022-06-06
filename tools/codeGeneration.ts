@@ -30,7 +30,11 @@ const getLines = (name: string, type: 'pipe' | 'compose' | 'pipeInto', numOverlo
     return [
         "import { Func } from './types/Func';",
         "import { UnaryFunction } from './types/UnaryFunction';",
-        "import { pipeImpl } from './pipeImpl';",
+        [
+            ...(type === 'compose'
+                ? ["import { composeImpl } from './composeImpl'"]
+                : ["import { pipeImpl } from './pipeImpl';"]),
+        ],
         [...(type === 'pipeInto' ? ["import { applyArgs } from './applyArgs'"] : [])],
         '',
         comments[type],
@@ -70,9 +74,9 @@ const getLines = (name: string, type: 'pipe' | 'compose' | 'pipeInto', numOverlo
                 : type === 'pipeInto'
                 ? ['return applyArgs(src).to(pipeImpl(o1, ...operations))']
                 : [
-                      'const o1 = args[args.length - 1] as Func<TIn, any>;',
-                      'const operations = args.slice(0, -1).reverse() as UnaryFunction<any, any>[];',
-                      'return pipeImpl(o1, ...operations)',
+                      //   'const o1 = args[args.length - 1] as Func<TIn, any>;',
+                      //   'const operations = args.slice(0, -1) as UnaryFunction<any, any>[];',
+                      'return composeImpl(...args);',
                   ]
             ).map((v) => `    ${v}`),
         ].join('\n'),

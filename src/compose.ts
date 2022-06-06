@@ -1,6 +1,6 @@
 import { Func } from './types/Func'
 import { UnaryFunction } from './types/UnaryFunction'
-import { pipeImpl } from './pipeImpl'
+import { composeImpl } from './composeImpl'
 
 /**
  * Type-enforcing right-to-left function composition function.
@@ -4309,7 +4309,5 @@ export function compose<
 export function compose<TIn extends any[], TOut>(
     ...args: [...operations: UnaryFunction<any, any>[], o1: Func<TIn, any>]
 ): Func<TIn, TOut> {
-    const o1 = args[args.length - 1] as Func<TIn, any>
-    const operations = args.slice(0, -1).reverse() as UnaryFunction<any, any>[]
-    return pipeImpl(o1, ...operations)
+    return composeImpl(...args)
 }
