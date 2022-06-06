@@ -4310,5 +4310,5 @@ export function pipe<TIn extends any[], TOut>(
     o1: Func<TIn, any>,
     ...operations: UnaryFunction<any, any>[]
 ): Func<TIn, TOut> {
-    return pipeImpl.bind(void 0, o1 as any).apply(void 0, operations) as Func<TIn, TOut>
+    return pipeImpl.bind(undefined, o1 as any).apply(undefined, operations) as Func<TIn, TOut>
 }

@@ -4309,5 +4309,5 @@ export function compose<
 export function compose<TIn extends any[], TOut>(
     ...args: [...operations: UnaryFunction<any, any>[], o1: Func<TIn, any>]
 ): Func<TIn, TOut> {
-    return (composeImpl as any).apply(void 0, args) as Func<TIn, TOut>
+    return (composeImpl as any).apply(undefined, args) as Func<TIn, TOut>
 }

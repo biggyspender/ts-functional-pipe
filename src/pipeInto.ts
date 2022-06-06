@@ -4338,5 +4338,5 @@ export function pipeInto<TIn, TOut>(
     o1: Func<[TIn], any>,
     ...operations: UnaryFunction<any, any>[]
 ): TOut {
-    return applyArgs(src).to(pipeImpl.bind(void 0, o1).apply(void 0, operations)) as TOut
+    return applyArgs(src).to(pipeImpl.bind(undefined, o1).apply(undefined, operations)) as TOut
 }

@@ -71,16 +71,16 @@ const getLines = (name: string, type: 'pipe' | 'compose' | 'pipeInto', numOverlo
         [
             ...(type === 'pipe'
                 ? [
-                      'return pipeImpl.bind(void 0, o1 as any).apply(void 0, operations) as Func<TIn, TOut>',
+                      'return pipeImpl.bind(undefined, o1 as any).apply(undefined, operations) as Func<TIn, TOut>',
                   ]
                 : type === 'pipeInto'
                 ? [
-                      'return applyArgs(src).to(pipeImpl.bind(void 0, o1).apply(void 0, operations)) as TOut',
+                      'return applyArgs(src).to(pipeImpl.bind(undefined, o1).apply(undefined, operations)) as TOut',
                   ]
                 : [
                       //   'const o1 = args[args.length - 1] as Func<TIn, any>;',
                       //   'const operations = args.slice(0, -1) as UnaryFunction<any, any>[];',
-                      'return (composeImpl as any).apply(void 0, args) as Func<TIn, TOut>',
+                      'return (composeImpl as any).apply(undefined, args) as Func<TIn, TOut>',
                   ]
             ).map((v) => `    ${v}`),
         ].join('\n'),

@@ -7,5 +7,5 @@ export function composeImpl<T extends any[], R>(
     const o1 = args[args.length - 1]
     const operations = args.slice(0, args.length - 1)
     return (...argsP: T) =>
-        operations.reduceRight((acc, f) => f(acc), (o1 as any).apply(void 0, argsP))
+        operations.reduceRight((acc, f) => f(acc), (o1 as any).apply(undefined, argsP))
 }
